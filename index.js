@@ -5,7 +5,7 @@ let ctx = canvas.getContext("2d");
 document.addEventListener("keydown", keyLeftHandler, false);
 document.addEventListener("keydown", keyRightHandler, false);
 
-let x = canvas.width / 2;
+let x = canvas.width / 5;
 let y = canvas.height - 30;
 let dx = 2; //Numero de movimientos
 let dy = -2; //Same
@@ -132,7 +132,7 @@ function collisionDetection() {
           b.broken = true;
           score++;
           if (score == brickRowCount * brickColumnCount) {
-            alert("YOU WIN, CONGRATULATIONS!");
+            alert("too easy!");
             document.location.reload();
             clearInterval(interval);
           }
