@@ -1,40 +1,8 @@
 let canvas = document.getElementById("theCanvas");
 let ctx = canvas.getContext("2d");
 
-//Paddler movement
-document.addEventListener("keydown", keyLeftHandler, false);
-document.addEventListener("keydown", keyRightHandler, false);
-
-let x = canvas.width / 5;
-let y = canvas.height - 30;
-let dx = 2; //Numero de movimientos
-let dy = -2; //Same
-const ballRadius = 10;
-
-//paddle
-let paddleHeight = 10;
-let paddleWidth = 75;
-let paddleX = (canvas.width - paddleWidth) / 2;
-let px = 10;
-
-function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-  ctx.fillStyle = "#800080";
-  ctx.fill();
-  ctx.closePath();
-}
-
-function drawPaddle() {
-  ctx.beginPath();
-  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#0095DD";
-  ctx.fill();
-  ctx.closePath();
-}
-
+//Main function
 function draw() {
-  //Main function
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBall();
   drawPaddle();
@@ -61,6 +29,58 @@ function draw() {
   if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
     dx = -dx;
   }
+}
+
+//Ball
+let x = canvas.width / 5;
+let y = canvas.height - 30;
+let dx = 2; //Numero de movimientos
+let dy = -2; //Same
+const ballRadius = 10;
+
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = "#800080";
+  ctx.fill();
+  ctx.closePath();
+}
+
+//Paddle
+
+//Paddler movement
+document.addEventListener("keydown", keyLeftHandler, false);
+document.addEventListener("keydown", keyRightHandler, false);
+
+let paddleHeight = 10;
+let paddleWidth = 75;
+let paddleX = (canvas.width - paddleWidth) / 2;
+let px = 10;
+
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+//Direccion de la bola en relacion con el paddle
+if (y + dy < ballRadius) {
+  //top
+  dy = -dy;
+} else if (y + dy > canvas.height - ballRadius)
+  if (x > paddleX && x < paddleX + paddleWidth) {
+    dy = -dy;
+  } else {
+    alert("GAME OVER");
+    document.location.reload();
+    clearInterval(interval); //cancela la alerta creada por el evento, resets the game
+  }
+
+//Derecha a izquierda
+if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+  dx = -dx;
 }
 
 let interval = setInterval(draw, 10);
