@@ -1,18 +1,21 @@
-var canvas = document.getElementById("theCanvas");
-var ctx = canvas.getContext("2d");
+let canvas = document.getElementById("theCanvas");
+let ctx = canvas.getContext("2d");
 
-// //Making a backg rectangle
-// ctx.beginPath();
-// ctx.rect(40, 60, 70, 70);
-// ctx.fillStyle = "#F08080";
-// ctx.fill();
-// ctx.closePath();
+//Paddler movement
+document.addEventListener("keydown", keyLeftHandler, false);
+document.addEventListener("keydown", keyRightHandler, false);
 
 let x = canvas.width / 2;
 let y = canvas.height - 30;
-let dx = 2;
-let dy = -2;
+let dx = 2; //Numero de movimientos
+let dy = -2; //Same
 const ballRadius = 10;
+
+//paddle
+let paddleHeight = 10;
+let paddleWidth = 75;
+let paddleX = (canvas.width - paddleWidth) / 2;
+let px = 10;
 
 function drawBall() {
   ctx.beginPath();
@@ -22,30 +25,121 @@ function drawBall() {
   ctx.closePath();
 }
 
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
 function draw() {
+  //Main function
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBall();
+  drawPaddle();
+  drawBricks();
+  collisionDetection();
   x += dx;
   y += dy;
 
-  //Esto que la direccion se invierta en cualquiera de los casos. Lo mantiene "dentro"
+  //Hace que la direccion se invierta en cualquiera de los casos. Lo mantiene "dentro"
   //De arriba a abajo
-  if(y + dy > canvas.height || y + dy < 0) {
+  if (y + dy < ballRadius) {
+    //top
+    dy = -dy;
+  } else if (y + dy > canvas.height - ballRadius)
+    if (x > paddleX && x < paddleX + paddleWidth) {
       dy = -dy;
-  }
+    } else {
+      alert("GAME OVER");
+      document.location.reload();
+      clearInterval(interval); //cancela la alerta creada por el evento, resets the game
+    }
 
   //Derecha a izquierda
-  if(x + dx > canvas.width || x + dx < 0) {
+  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
     dx = -dx;
+  }
 }
 
+let interval = setInterval(draw, 10);
+
+function keyLeftHandler(e) {
+  // console.log(e);
+  if (e.code == "ArrowLeft") {
+    paddleX -= px;
+  }
 }
-setInterval(draw, 10);
 
+function keyRightHandler(e) {
+  if (e.code == "ArrowRight") {
+    paddleX += px;
+  }
+}
 
-// //rectangle
-// ctx.beginPath();
-// ctx.rect(160, 10, 100, 40);
-// ctx.strokeStyle = "#20B2AA";
-// ctx.stroke();
-// ctx.closePath();
+//Create a pause bttn
+
+//Bricks
+const brickRowCount = 3;
+const brickColumnCount = 5;
+const brickWidth = 75;
+const brickHeight = 20;
+const brickPadding = 10;
+const brickOffsetTop = 30;
+const brickOffsetLeft = 30;
+
+let bricks = [];
+
+for (let c = 0; c < brickColumnCount; c++) {
+  bricks[c] = [];
+
+  for (let r = 0; r < brickRowCount; r++) {
+    bricks[c][r] = { x: 0, y: 0, broken: false };
+  }
+}
+
+function drawBricks() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount; r++) {
+      if (bricks[c][r].broken == false) {
+        const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+        const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.beginPath();
+        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
+}
+
+//Bricks colision
+function collisionDetection() {
+  for (let c = 0; c < brickColumnCount; c++) {
+    for (let r = 0; r < brickRowCount; r++) {
+      let b = bricks[c][r];
+      if (b.broken == false) {
+        if (
+          x > b.x &&
+          x < b.x + brickWidth &&
+          (y > b.y && y < b.y + brickHeight)
+        ) {
+          dy = -dy;
+          b.broken = true;
+          score++;
+          if (score == brickRowCount * brickColumnCount) {
+            alert("YOU WIN, CONGRATULATIONS!");
+            document.location.reload();
+            clearInterval(interval);
+          }
+        }
+      }
+    }
+  }
+}
+
+let score = 0;
