@@ -1,12 +1,11 @@
 let canvas = document.getElementById("theCanvas");
 let ctx = canvas.getContext("2d");
 
-//Main function
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBall();
   drawPaddle();
-  drawBricks();
+  drawBricks(brickConfig, bricks);
   collisionDetection();
   x += dx;
   y += dy;
@@ -101,13 +100,13 @@ function keyRightHandler(e) {
 //Create a pause bttn
 
 //Bricks
-const brickRowCount = 3;
-const brickColumnCount = 5;
-const brickWidth = 75;
-const brickHeight = 20;
-const brickPadding = 10;
-const brickOffsetTop = 30;
-const brickOffsetLeft = 30;
+// const brickRowCount = 3;
+// const brickColumnCount = 5;
+// const brickWidth = 75;
+// const brickHeight = 20;
+// const brickPadding = 10;
+// const brickOffsetTop = 30;
+// const brickOffsetLeft = 30;
 
 let bricks = [];
 
@@ -119,23 +118,23 @@ for (let c = 0; c < brickColumnCount; c++) {
   }
 }
 
-function drawBricks() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
-      if (bricks[c][r].broken == false) {
-        const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-        const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
-        ctx.beginPath();
-        ctx.rect(brickX, brickY, brickWidth, brickHeight);
-        ctx.fillStyle = "#0095DD";
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-  }
-}
+// function drawBricks() {
+//   for (let c = 0; c < brickColumnCount; c++) {
+//     for (let r = 0; r < brickRowCount; r++) {
+//       if (bricks[c][r].broken == false) {
+//         const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+//         const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+//         bricks[c][r].x = brickX;
+//         bricks[c][r].y = brickY;
+//         ctx.beginPath();
+//         ctx.rect(brickX, brickY, brickWidth, brickHeight);
+//         ctx.fillStyle = "#0095DD";
+//         ctx.fill();
+//         ctx.closePath();
+//       }
+//     }
+//   }
+// }
 
 //Bricks colision
 function collisionDetection() {
@@ -163,3 +162,45 @@ function collisionDetection() {
 }
 
 let score = 0;
+
+let brickConfig = {
+  brickRowCount: 3,
+  brickColumnCount: 5,
+  brickWidth: 75,
+  brickHeight: 20,
+  brickPadding: 10,
+  brickOffsetTop: 30,
+  brickOffsetLeft: 30
+};
+
+/**
+ * draws bricks in canvas using the state of the bricks argument and settings from brickConfig
+ * @param {Object} brickConfig
+ * @param {Array} bricks
+ */
+function drawBricks(brickConfig, bricks) {
+  for (let c = 0; c < brickConfig.brickColumnCount; c++) {
+    for (let r = 0; r < brickConfig.brickRowCount; r++) {
+      if (bricks[c][r].broken == false) {
+        const brickX =
+          c * (brickConfig.brickWidth + brickConfig.brickPadding) +
+          brickConfig.brickOffsetLeft;
+        const brickY =
+          r * (brickConfig.brickHeight + brickConfig.brickPadding) +
+          brickConfig.brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.beginPath();
+        ctx.rect(
+          brickX,
+          brickY,
+          brickConfig.brickWidth,
+          brickConfig.brickHeight
+        );
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
+}
