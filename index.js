@@ -1,35 +1,6 @@
 let canvas = document.getElementById("theCanvas");
 let ctx = canvas.getContext("2d");
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBall();
-  drawPaddle();
-  drawBricks(brickConfig, bricks);
-  collisionDetection();
-  x += dx;
-  y += dy;
-
-  //Hace que la direccion se invierta en cualquiera de los casos. Lo mantiene "dentro"
-  //De arriba a abajo
-  if (y + dy < ballRadius) {
-    //top
-    dy = -dy;
-  } else if (y + dy > canvas.height - ballRadius)
-    if (x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
-    } else {
-      alert("GAME OVER");
-      document.location.reload();
-      clearInterval(interval); //cancela la alerta creada por el evento, resets the game
-    }
-
-  //Derecha a izquierda
-  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-    dx = -dx;
-  }
-}
-
 //Ball
 let x = canvas.width / 5;
 let y = canvas.height - 30;
@@ -37,7 +8,7 @@ let dx = 2; //Numero de movimientos
 let dy = -2; //Same
 const ballRadius = 10;
 
-function drawBall() {
+function drawBall(x, y) {
   ctx.beginPath();
   ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
   ctx.fillStyle = "#800080";
@@ -99,58 +70,47 @@ function keyRightHandler(e) {
 
 //Create a pause bttn
 
-//Bricks
-// const brickRowCount = 3;
-// const brickColumnCount = 5;
-// const brickWidth = 75;
-// const brickHeight = 20;
-// const brickPadding = 10;
-// const brickOffsetTop = 30;
-// const brickOffsetLeft = 30;
-
 let bricks = [];
+let brickConfig = {
+  brickRowCount: 3,
+  brickColumnCount: 5,
+  brickWidth: 75,
+  brickHeight: 20,
+  brickPadding: 10,
+  brickOffsetTop: 30,
+  brickOffsetLeft: 30
+};
 
-for (let c = 0; c < brickColumnCount; c++) {
+for (let c = 0; c < brickConfig.brickColumnCount; c++) {
   bricks[c] = [];
 
-  for (let r = 0; r < brickRowCount; r++) {
+  for (let r = 0; r < brickConfig.brickRowCount; r++) {
     bricks[c][r] = { x: 0, y: 0, broken: false };
   }
 }
 
-// function drawBricks() {
-//   for (let c = 0; c < brickColumnCount; c++) {
-//     for (let r = 0; r < brickRowCount; r++) {
-//       if (bricks[c][r].broken == false) {
-//         const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-//         const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-//         bricks[c][r].x = brickX;
-//         bricks[c][r].y = brickY;
-//         ctx.beginPath();
-//         ctx.rect(brickX, brickY, brickWidth, brickHeight);
-//         ctx.fillStyle = "#0095DD";
-//         ctx.fill();
-//         ctx.closePath();
-//       }
-//     }
-//   }
-// }
-
-//Bricks colision
-function collisionDetection() {
-  for (let c = 0; c < brickColumnCount; c++) {
-    for (let r = 0; r < brickRowCount; r++) {
+/**
+ *
+ * @param {Object} brickConfig
+ * @param {Array} bricks
+ */
+function collisionDetection(brickConfig, bricks) {
+  for (let c = 0; c < brickConfig.brickColumnCount; c++) {
+    for (let r = 0; r < brickConfig.brickRowCount; r++) {
       let b = bricks[c][r];
       if (b.broken == false) {
         if (
           x > b.x &&
-          x < b.x + brickWidth &&
-          (y > b.y && y < b.y + brickHeight)
+          x < b.x + brickConfig.brickWidth &&
+          (y > b.y && y < b.y + brickConfig.brickHeight)
         ) {
           dy = -dy;
           b.broken = true;
           score++;
-          if (score == brickRowCount * brickColumnCount) {
+          if (
+            score ==
+            brickConfig.brickRowCount * brickConfig.brickColumnCount
+          ) {
             alert("too easy!");
             document.location.reload();
             clearInterval(interval);
@@ -162,16 +122,6 @@ function collisionDetection() {
 }
 
 let score = 0;
-
-let brickConfig = {
-  brickRowCount: 3,
-  brickColumnCount: 5,
-  brickWidth: 75,
-  brickHeight: 20,
-  brickPadding: 10,
-  brickOffsetTop: 30,
-  brickOffsetLeft: 30
-};
 
 /**
  * draws bricks in canvas using the state of the bricks argument and settings from brickConfig
@@ -202,5 +152,34 @@ function drawBricks(brickConfig, bricks) {
         ctx.closePath();
       }
     }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBall(x, y);
+  drawPaddle();
+  drawBricks(brickConfig, bricks);
+  collisionDetection(brickConfig, bricks);
+  x += dx;
+  y += dy;
+
+  //Hace que la direccion se invierta en cualquiera de los casos. Lo mantiene "dentro"
+  //De arriba a abajo
+  if (y + dy < ballRadius) {
+    //top
+    dy = -dy;
+  } else if (y + dy > canvas.height - ballRadius)
+    if (x > paddleX && x < paddleX + paddleWidth) {
+      dy = -dy;
+    } else {
+      alert("GAME OVER");
+      document.location.reload();
+      clearInterval(interval); //cancela la alerta creada por el evento, resets the game
+    }
+
+  //Derecha a izquierda
+  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+    dx = -dx;
   }
 }
